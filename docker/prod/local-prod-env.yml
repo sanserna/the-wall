@@ -1,0 +1,16 @@
+version: '3'
+services:
+  the-wall:
+    image: the-wall-eci:latest
+    container_name: the-wall-local-prod
+    ports:
+      - 8080:8080
+    environment:
+      - REDIS_HOST=cache-local-prod
+    links:
+      - redis
+  redis:
+    image: redis
+    container_name: cache-local-prod
+    expose:
+      - 6379

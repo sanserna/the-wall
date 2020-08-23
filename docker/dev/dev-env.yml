@@ -1,0 +1,24 @@
+version: '3'
+services:
+  the-wall:
+    build: .
+    container_name: the-wall-dev
+    command:
+      - /bin/bash
+      - -c
+      - |
+        yarn install
+        yarn start
+    volumes:
+      - ../..:/Code/the-wall
+    ports:
+      - 8080:8080
+    environment:
+      - REDIS_HOST=cache-dev
+    links:
+      - redis
+  redis:
+    image: redis
+    container_name: cache-dev
+    expose:
+      - 6379
