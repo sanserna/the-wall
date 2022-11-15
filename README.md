@@ -1,6 +1,6 @@
 # The Wall API & Middleware
 
-This application is intended to act as a _middleware_ between the any backend API, external services, and the client. **The Wall**'s responsibility is to host all the business logic so the client just have to worry about front end logic, for example, rendering the data.
+This application is intended to act as a _middleware_ between any backend API, external services, and the client. **The Wall**'s responsibility is to host all the business logic so the client just have to worry about front end logic, for example, rendering the data.
 
 The API uses the [jsonapi](https://jsonapi.org/) specification to serialize JSON between the server and the client.
 

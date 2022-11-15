@@ -1,7 +1,7 @@
 /* eslint global-require: 0 import/no-dynamic-require: 0 */
 
 // Require wrapper to facilitate files imports
-global.rootRequire = path => require(`${__dirname}/${path}`);
+global.rootRequire = (path) => require(`${__dirname}/${path}`);
 
 const app = require('./lib/app');
 
