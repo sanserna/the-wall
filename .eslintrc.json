@@ -5,10 +5,10 @@
   },
   "extends": [
     "airbnb-base",
+    "prettier",
     "plugin:jest/recommended",
     "plugin:import/recommended",
-    "plugin:security/recommended",
-    "plugin:prettier/recommended"
+    "plugin:security/recommended"
   ],
   "plugins": ["jest", "security", "prettier"],
   "parserOptions": {
@@ -18,13 +18,13 @@
     "no-console": "error",
     "func-names": "off",
     "no-underscore-dangle": "off",
-    "max-len": [
-      "error",
-      {
-        "code": 125,
-        "ignoreTrailingComments": true,
-        "ignoreStrings": true
+    "no-use-before-define": ["error", { "functions": false }]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "paths": ["."]
       }
-    ]
+    }
   }
 }
