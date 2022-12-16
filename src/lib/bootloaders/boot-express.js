@@ -41,16 +41,10 @@ const getEnvLoggerBaseConfig = (appEnv) => {
       // eslint-disable-next-line no-param-reassign
       info.level = info.level.toUpperCase();
       return info;
-    })(),
+    })()
   );
-  const splunkLogFormat = winston.format.combine(
-    baseLogFormat,
-    winston.format.json(),
-  );
-  const prettyLogFormat = winston.format.combine(
-    baseLogFormat,
-    winston.format.prettyPrint(),
-  );
+  const splunkLogFormat = winston.format.combine(baseLogFormat, winston.format.json());
+  const prettyLogFormat = winston.format.combine(baseLogFormat, winston.format.prettyPrint());
 
   return {
     level: process.env.LOG_LEVEL,
@@ -59,9 +53,7 @@ const getEnvLoggerBaseConfig = (appEnv) => {
       const { requestId } = new RequestContext(req);
       return { requestId };
     },
-    transports: appEnv.isProduction()
-      ? [new StackdriverTransport()]
-      : [new winston.transports.Console()],
+    transports: appEnv.isProduction() ? [new StackdriverTransport()] : [new winston.transports.Console()],
   };
 };
 
@@ -92,19 +84,16 @@ const routeValidationMiddleware = (req, res, next) => {
 // Global body deserialization middleware
 const bodyDeserializationMiddleware = (req, res, next) => {
   if (Object.entries(req.body).length) {
-    new Deserializer({ keyForAttribute: 'snake_case' }).deserialize(
-      req.body,
-      (err, body) => {
-        if (err) {
-          next(err);
+    new Deserializer({ keyForAttribute: 'snake_case' }).deserialize(req.body, (err, body) => {
+      if (err) {
+        next(err);
 
-          return;
-        }
+        return;
+      }
 
-        req.body = body;
-        next();
-      },
-    );
+      req.body = body;
+      next();
+    });
   } else {
     next();
   }
@@ -155,42 +144,34 @@ const createExpressApplication = (appEnv) => {
       validationMiddlewares.push(validators);
     }
 
-    app[method](
-      routePath,
-      validationMiddlewares,
-      routeValidationMiddleware,
-      resolverWrapper(resolver),
-    );
+    app[method](routePath, validationMiddlewares, routeValidationMiddleware, resolverWrapper(resolver));
   });
 
   if (!appEnv.isTest()) {
     // Setup wiston error logger
     // IMPORTANT: Request logs need to be registered after the routes
-    app.use(expressWinston.errorLogger({
-      ...loggerBaseConfig,
-      exceptionToMeta: (err) => {
-        if (err.isAxiosError) {
-          const {
-            url,
-            method,
-            baseURL,
-            data,
-          } = err.config;
+    app.use(
+      expressWinston.errorLogger({
+        ...loggerBaseConfig,
+        exceptionToMeta: (err) => {
+          if (err.isAxiosError) {
+            const { url, method, baseURL, data } = err.config;
 
-          return winston.exceptions.getAllInfo({
-            ...err.toJSON(),
-            config: {
-              url,
-              method,
-              baseURL,
-              data,
-            },
-          });
-        }
+            return winston.exceptions.getAllInfo({
+              ...err.toJSON(),
+              config: {
+                url,
+                method,
+                baseURL,
+                data,
+              },
+            });
+          }
 
-        return winston.exceptions.getAllInfo(err);
-      },
-    }));
+          return winston.exceptions.getAllInfo(err);
+        },
+      })
+    );
   }
 
   // App validation middleware: entire error handling reside within this middleware
@@ -198,12 +179,13 @@ const createExpressApplication = (appEnv) => {
   // and expressWinston error logger
   // eslint-disable-next-line no-unused-vars
   app.use((error, req, res, next) => {
-    const responseErr = error instanceof TheWallError
-      ? error
-      : new UnhandledError({
-        code: getStatusText(INTERNAL_SERVER_ERROR),
-        error,
-      });
+    const responseErr =
+      error instanceof TheWallError
+        ? error
+        : new UnhandledError({
+            code: getStatusText(INTERNAL_SERVER_ERROR),
+            error,
+          });
 
     responseErr.sendResponse(res);
   });
