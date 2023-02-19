@@ -6,9 +6,9 @@ function createControllerRoutes(controllerUri) {
     controllerUri
   );
   // eslint-disable-next-line security/detect-non-literal-require, import/no-dynamic-require, global-require
-  const Controller = require(controllerPath);
+  const createController = require(controllerPath);
 
-  return Controller();
+  return createController();
 }
 
 module.exports = createControllerRoutes;

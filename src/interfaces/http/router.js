@@ -5,8 +5,9 @@ const compression = require('compression');
 const cors = require('cors');
 const { partialRight } = require('ramda');
 
-const httpLogger = require('./middlewares/http-logger');
 const createController = require('./utils/create-controller');
+const httpLogger = require('./middlewares/http-logger');
+const { errorConventer, errorHandler } = require('./middlewares/error');
 
 function makeRouter({ config, logger }) {
   const router = express.Router();
@@ -47,6 +48,11 @@ function makeRouter({ config, logger }) {
   apiRouter.use('/users', createController('user').router);
 
   router.use(`/api/v1`, apiRouter);
+
+  // convert error to ApiError, if needed
+  router.use(errorConventer);
+  // handle error
+  router.use(partialRight(errorHandler, [logger, config]));
 
   return router;
 }
